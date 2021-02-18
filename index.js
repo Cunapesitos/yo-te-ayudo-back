@@ -2,36 +2,41 @@
 
 require('dotenv').config()
 
-var express = require('express');
-var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
 
-var app = express();
+var db_host = process.env.DB_HOST || 'localhost';
+var db_port = process.env.DB_PORT || '27017';
+var db_name = process.env.DB_NAME || 'yo_te_ayudo_db';
+var connection_string = `mongodb://${db_host}:${db_port}/${db_name}`;
+var connection_config_params = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true
+};
 
-const host = process.env.APP_HOST || 'http://localhost';
-const port = process.env.PORT || 3000;
+console.log("Connecting to db...");
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-//CORS
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-    res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
-    next();
+mongoose.set('useFindAndModify', false);
+mongoose.connect(
+    connection_string,
+    connection_config_params
+).then(() => {
+    console.log('Connected to db.\nStarting app...');
+    startApp();
+}).catch(error => {
+    console.log('Error connecting to db...\n' + error);
 });
-app.use(express.static('public'));
-app.listen(port, () => {
-    console.log(`App started.\nApp listening at ${host}`);
-});
 
-var user_routes = require('./components/user/UserRoutes');
+function startApp() {
+    try {
+        var app = require('./app');
+        const app_port = process.env.PORT || 3000;
+        const app_host = process.env.APP_HOST || 'localhost';
 
-app.get('/', (req, res) => res.redirect('/echo'));
-app.get('/echo', (req, res) => res.send("echo"));
-app.post('/post', (req, res) => res.send(req.body));
-
-app.use('/api', user_routes);
-
-
-module.exports = app;
+        app.listen(app_port, () => {
+            console.log(`App started.\nApp listening at http://${app_host}`);
+        });
+    } catch (error) {
+        console.log('Error starting app...\n' + error);
+    }
+}

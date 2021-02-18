@@ -2,6 +2,7 @@
 
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
+var Constants = require('../../utils/Constants');
 
 var Schema = mongoose.Schema;
 
@@ -29,7 +30,8 @@ var userSchema = Schema({
     },
     role: {
         type: String,
-        required: true
+        required: true,
+        default: Constants.ROLE_NORMAL
     },
     created_at: {
         type: Date,
@@ -39,7 +41,7 @@ var userSchema = Schema({
 });
 
 userSchema.pre('save', async function (next) {
-    const hash = await bcrypt.hash(this.password, process.env.APP_SECRET_SALT_OR_ROUNDS_COUNT);
+    const hash = await bcrypt.hash(this.password, +process.env.APP_SECRET_SALT_OR_ROUNDS_COUNT);
     this.password = hash;
     next();
 });
