@@ -17,7 +17,7 @@ app.use((req, res, next) => {
 });
 app.use(express.static('public'));
 
-var user_routes = require('./components/user/UserRoutes');
+var user_routes = require('../components/user/UserRoutes');
 
 app.get('/', (req, res) => res.redirect('/echo'));
 app.get('/echo', (req, res) => res.send("echo"));
