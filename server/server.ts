@@ -1,6 +1,7 @@
-import express = require('express');
 import dotenv = require('dotenv');
 import mongoose = require('mongoose');
+
+dotenv.config();
 
 var db_host = process.env.DB_HOST || 'localhost';
 var db_port = process.env.DB_PORT || '27017';
@@ -12,22 +13,23 @@ var connection_config_params = {
     useCreateIndex: true
 };
 
-console.log("Connecting to db...");
+console.log("\nConnecting to db...\n");
 
 mongoose.set('useFindAndModify', false);
 mongoose.connect(
     connection_string,
     connection_config_params
 ).then(() => {
-    console.log('Connected to db.\nStarting app...');
+    console.log('Connected to db.\n\nStarting app...');
     startApp();
 }).catch(error => {
-    console.log('Error connecting to db...\n' + error);
+    console.log('\nError connecting to db...\n' + error);
+    console.log('\nApp not started.\n\n');
 });
 
 function startApp() {
     try {
-        var app = require('./app');
+        import app = require('./app');
         const app_port = process.env.PORT || 3000;
         const app_host = process.env.APP_HOST || 'localhost';
 
