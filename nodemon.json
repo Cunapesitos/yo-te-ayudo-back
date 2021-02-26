@@ -1,0 +1,10 @@
+{ 
+    "watch": [
+        "*.ts",
+        "*.js",
+        "*.json"
+    ],
+    "ignore": [
+    ],
+    "exec": "node server/server.js"
+}
